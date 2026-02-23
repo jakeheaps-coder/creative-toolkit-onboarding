@@ -1317,7 +1317,7 @@
     });
   }
 
-  function requestAccess() {
+  function requestAccess() { var ROLE = 'owner';
     const username = document.getElementById('githubUsername').value.trim();
     if (!username) {
       document.getElementById('githubUsername').focus();
@@ -1325,8 +1325,8 @@
       setTimeout(() => { document.getElementById('githubUsername').style.borderColor = ''; }, 2000);
       return;
     }
-    const subject = encodeURIComponent('Toolkit Access Request');
-    const body = encodeURIComponent(`Hi Jake,\n\nI'd like access to the Creative Director Toolkit.\n\nGitHub username: ${username}\n\nThanks!`);
+    const fullName = document.getElementById('fullName').value.trim(); if (!fullName) { document.getElementById('fullName').focus(); document.getElementById('fullName').style.borderColor = 'var(--accent-orange)'; setTimeout(() => { document.getElementById('fullName').style.borderColor = ''; }, 2000); return; } const subject = encodeURIComponent('Toolkit Access Request - ' + ROLE);
+    const body = encodeURIComponent('Hi Jake,\n\nI'd like access to the Creative Director Toolkit.\n\nName: ' + fullName + '\nGitHub Username: ' + username + '\nRole: ' + ROLE + '\n\nThanks!');
     window.location.href = `mailto:jake.heaps@domo.com?subject=${subject}&body=${body}`;
     document.getElementById('formSuccess').classList.add('show');
     document.getElementById('requestAccessBtn').textContent = 'Sent!';
