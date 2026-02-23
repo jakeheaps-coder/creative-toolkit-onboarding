@@ -1327,7 +1327,7 @@
     }
     const fullName = document.getElementById('fullName').value.trim(); if (!fullName) { document.getElementById('fullName').focus(); document.getElementById('fullName').style.borderColor = 'var(--accent-orange)'; setTimeout(() => { document.getElementById('fullName').style.borderColor = ''; }, 2000); return; } const subject = encodeURIComponent('Toolkit Access Request - ' + ROLE);
     const body = encodeURIComponent('Hi Jake,\n\nI'd like access to the Creative Director Toolkit.\n\nName: ' + fullName + '\nGitHub Username: ' + username + '\nRole: ' + ROLE + '\n\nThanks!');
-    window.location.href = `mailto:jake.heaps@domo.com?subject=${subject}&body=${body}`;
+    fetch('https://toolkit-access-api-1053548598846.us-central1.run.app/api/request-access', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: fullName, username: username, role: ROLE, page: window.location.pathname }) }).then(r => r.json()).then(data => { console.log('Access request sent:', data); }).catch(err => { console.error('API error:', err); });
     document.getElementById('formSuccess').classList.add('show');
     document.getElementById('requestAccessBtn').textContent = 'Sent!';
     document.getElementById('requestAccessBtn').style.background = 'var(--accent-mint)';
