@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Domo Creative Toolkit — Owner Setup</title>
+  <title>Domo Toolkit — Owner Setup</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700;800&display=swap" rel="stylesheet">
@@ -841,7 +841,7 @@
       <span class="dot"></span>
       Powered by Claude Code
     </div>
-    <h1>Domo Creative Toolkit</h1>
+    <h1>Domo Toolkit</h1>
     <p>Build landing pages, generate images, create videos, and more — all with AI. No coding required.</p>
     <div class="hero-scroll-hint">
       Follow the steps below to get started
@@ -1269,7 +1269,7 @@
   </svg>
   <p>Questions? Reach out to <a href="mailto:jake.heaps@domo.com">jake.heaps@domo.com</a></p>
   <div class="footer-divider"></div>
-  <p class="footer-small">Domo Creative Toolkit &middot; Domo Marketing &middot; 2026</p>
+  <p class="footer-small">Domo Toolkit &middot; Domo Marketing &middot; 2026</p>
 </footer>
 
 <!-- SCRIPTS -->
@@ -1326,7 +1326,7 @@
       return;
     }
     const fullName = document.getElementById('fullName').value.trim(); if (!fullName) { document.getElementById('fullName').focus(); document.getElementById('fullName').style.borderColor = 'var(--accent-orange)'; setTimeout(() => { document.getElementById('fullName').style.borderColor = ''; }, 2000); return; } const subject = encodeURIComponent('Toolkit Access Request - ' + ROLE);
-    const body = encodeURIComponent('Hi Jake,\n\nI'd like access to the Creative Director Toolkit.\n\nName: ' + fullName + '\nGitHub Username: ' + username + '\nRole: ' + ROLE + '\n\nThanks!');
+    const body = encodeURIComponent('Hi Jake,\n\nI would like access to the Domo Toolkit.\n\nName: ' + fullName + '\nGitHub Username: ' + username + '\nRole: ' + ROLE + '\n\nThanks!');
     fetch('https://toolkit-access-api-1053548598846.us-central1.run.app/api/request-access', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: fullName, username: username, role: ROLE, page: window.location.pathname }) }).then(r => r.json()).then(data => { console.log('Access request sent:', data); }).catch(err => { console.error('API error:', err); });
     document.getElementById('formSuccess').classList.add('show');
     document.getElementById('requestAccessBtn').textContent = 'Sent!';
