@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Domo Toolkit — Editor Setup</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --domo-blue: #99CCEE;
+      --domo-blue-dark: #7BB8E0;
+      --neutral-50: #F1F6FA;
+      --neutral-100: #DCE4EA;
+      --neutral-200: #B7C1CB;
+      --neutral-600: #68737F;
+      --neutral-900: #3F454D;
+      --accent-orange: #FF9922;
+      --accent-orange-hover: #E8891F;
+      --accent-mint: #ADD4C1;
+      --font-primary: 'Open Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      --shadow-sm: 0 1px 3px rgba(63,69,77,0.08), 0 1px 2px rgba(63,69,77,0.06);
+      --shadow-md: 0 4px 12px rgba(63,69,77,0.1), 0 2px 4px rgba(63,69,77,0.06);
+      --shadow-lg: 0 8px 20px rgba(63,69,77,0.08), 0 4px 8px rgba(63,69,77,0.04);
+      --shadow-orange-glow: 0 4px 20px rgba(255, 153, 34, 0.3);
+      --shadow-blue-glow: 0 4px 20px rgba(153, 204, 238, 0.3);
+      --radius-sm: 6px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-xl: 16px;
+      --ease-smooth: cubic-bezier(0.83, 0, 0.17, 1);
+      --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: var(--font-primary); color: var(--neutral-900); background: #FFFFFF; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; overflow-x: hidden; }
+
+    @keyframes domoFadeInUp { from { opacity: 0; transform: translateY(2rem); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes domoFadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+    @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+    @keyframes pulseGlow { 0%, 100% { box-shadow: 0 0 0 0 rgba(255, 153, 34, 0.4); } 50% { box-shadow: 0 0 0 12px rgba(255, 153, 34, 0); } }
+    @keyframes drawLine { from { height: 0; } to { height: 100%; } }
+
+    .animate-on-scroll { opacity: 0; transform: translateY(2rem); transition: opacity 0.6s var(--ease-out-expo), transform 0.6s var(--ease-out-expo); }
+    .animate-on-scroll.visible { opacity: 1; transform: translateY(0); }
+
+    .navbar { position: fixed; top: 3px; left: 0; right: 0; z-index: 999; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(12px); border-bottom: 1px solid var(--neutral-100); }
+    .navbar-inner { max-width: 1100px; margin: 0 auto; padding: 0 2rem; display: flex; align-items: center; height: 56px; gap: 0.25rem; }
+    .navbar-logo { width: 32px; height: 32px; margin-right: 0.5rem; flex-shrink: 0; }
+    .navbar-role { font-size: 0.75rem; font-weight: 700; color: var(--neutral-900); margin-right: 1rem; white-space: nowrap; }
+    .navbar-links { display: flex; align-items: center; gap: 0.125rem; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+    .navbar-links::-webkit-scrollbar { display: none; }
+    .navbar-link { display: flex; align-items: center; gap: 0.35rem; padding: 0.4rem 0.65rem; font-size: 0.75rem; font-weight: 600; color: var(--neutral-600); text-decoration: none; border-radius: var(--radius-sm); white-space: nowrap; transition: all 0.2s var(--ease-smooth); }
+    .navbar-link:hover { color: var(--neutral-900); background: var(--neutral-50); }
+    .navbar-link.active { color: var(--domo-blue-dark); background: rgba(153, 204, 238, 0.1); }
+    .navbar-link .nav-num { display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; border-radius: 50%; background: var(--neutral-100); font-size: 0.65rem; font-weight: 700; color: var(--neutral-600); flex-shrink: 0; }
+    .navbar-link.active .nav-num { background: var(--domo-blue); color: #FFFFFF; }
+
+    @media (max-width: 768px) {
+      .navbar-inner { padding: 0 1rem; }
+      .navbar-link { padding: 0.35rem 0.5rem; font-size: 0.7rem; }
+      .navbar-link .nav-label { display: none; }
+      .navbar-link .nav-num { width: 22px; height: 22px; font-size: 0.7rem; }
+    }
+
+    .hero { background: linear-gradient(180deg, var(--domo-blue) 0%, var(--domo-blue-dark) 100%); padding: 8rem 2rem 5rem; text-align: center; position: relative; overflow: hidden; }
+    .hero::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(ellipse at 30% 20%, rgba(255,255,255,0.15) 0%, transparent 60%), radial-gradient(ellipse at 70% 80%, rgba(255,255,255,0.1) 0%, transparent 50%); pointer-events: none; }
+    .hero::after { content: ''; position: absolute; inset: 0; opacity: 0.02; background: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='4' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); pointer-events: none; }
+    .hero-content { position: relative; z-index: 1; max-width: 800px; margin: 0 auto; animation: domoFadeInUp 0.8s var(--ease-out-expo); }
+    .hero-badge { display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.25); padding: 0.5rem 1.25rem; border-radius: 100px; font-size: 0.85rem; font-weight: 600; color: #FFFFFF; margin-bottom: 2rem; }
+    .hero-badge .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent-mint); animation: pulseGlow 2s infinite; }
+    .hero h1 { font-size: clamp(2.5rem, 6vw, 4rem); font-weight: 800; color: #FFFFFF; letter-spacing: -0.02em; line-height: 1.1; margin-bottom: 1rem; }
+    .hero p { font-size: clamp(1.1rem, 2.5vw, 1.35rem); font-weight: 300; color: rgba(255,255,255,0.9); line-height: 1.5; max-width: 600px; margin: 0 auto 2rem; }
+    .hero-scroll-hint { margin-top: 2rem; color: rgba(255,255,255,0.6); font-size: 0.8rem; font-weight: 400; letter-spacing: 0.05em; }
+    .hero-scroll-hint svg { display: block; margin: 0.5rem auto 0; animation: float 2s ease-in-out infinite; }
+
+    .container { max-width: 860px; margin: 0 auto; padding: 0 2rem; }
+    section { padding: 5rem 0; scroll-margin-top: 60px; }
+    section:nth-child(odd) { background: #FFFFFF; }
+    section:nth-child(even) { background: var(--neutral-50); }
+
+    .step { position: relative; padding-left: 5rem; }
+    .step-number { position: absolute; left: 0; top: 0; width: 3.5rem; height: 3.5rem; border-radius: 50%; background: var(--domo-blue); color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; font-weight: 700; box-shadow: var(--shadow-blue-glow); flex-shrink: 0; }
+    .step h2 { font-size: clamp(1.5rem, 3.5vw, 2rem); font-weight: 700; color: var(--neutral-900); letter-spacing: -0.01em; line-height: 1.2; margin-bottom: 0.75rem; }
+    .step .step-desc { font-size: 1.05rem; font-weight: 400; color: var(--neutral-600); line-height: 1.6; margin-bottom: 1.5rem; }
+    .step-connector { position: absolute; left: 1.7rem; top: 3.5rem; width: 2px; bottom: -5rem; background: linear-gradient(180deg, var(--domo-blue), var(--neutral-100)); opacity: 0.4; }
+
+    .btn-primary { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.875rem 2rem; background: var(--accent-orange); color: #FFFFFF; border: none; border-radius: var(--radius-md); font-family: var(--font-primary); font-weight: 600; font-size: 1rem; cursor: pointer; text-decoration: none; transition: all 0.3s var(--ease-smooth); box-shadow: var(--shadow-sm); }
+    .btn-primary:hover { background: var(--accent-orange-hover); transform: translateY(-2px); box-shadow: var(--shadow-orange-glow); }
+    .btn-primary:active { transform: translateY(0); }
+    .btn-primary svg { width: 18px; height: 18px; transition: transform 0.3s var(--ease-smooth); }
+    .btn-primary:hover svg { transform: translateX(3px); }
+
+    .sub-steps { list-style: none; margin: 1.25rem 0; padding: 0; }
+    .sub-steps li { position: relative; padding: 0.6rem 0 0.6rem 2.5rem; font-size: 0.95rem; color: var(--neutral-600); line-height: 1.5; }
+    .sub-steps li::before { content: attr(data-step); position: absolute; left: 0; top: 0.55rem; width: 1.75rem; height: 1.75rem; border-radius: 50%; background: var(--neutral-50); border: 1.5px solid var(--neutral-100); display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 600; color: var(--neutral-600); }
+    .sub-steps li strong { color: var(--neutral-900); font-weight: 600; }
+
+    .note { display: flex; align-items: flex-start; gap: 0.75rem; margin-top: 1.25rem; padding: 1rem 1.25rem; background: rgba(153, 204, 238, 0.08); border-left: 3px solid var(--domo-blue); border-radius: 0 var(--radius-md) var(--radius-md) 0; font-size: 0.875rem; color: var(--neutral-600); line-height: 1.5; }
+    .note svg { flex-shrink: 0; width: 18px; height: 18px; color: var(--domo-blue); margin-top: 1px; }
+    .note.warning { background: rgba(255, 153, 34, 0.06); border-left-color: var(--accent-orange); }
+    .note.warning svg { color: var(--accent-orange); }
+
+    .code-block { position: relative; background: var(--neutral-900); border-radius: var(--radius-lg); padding: 1.5rem; margin: 1.25rem 0; overflow-x: auto; }
+    .code-block code { font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace; font-size: 0.875rem; color: #E8ECF0; line-height: 1.6; white-space: pre-wrap; word-break: break-all; }
+    .code-block .copy-btn { position: absolute; top: 0.75rem; right: 0.75rem; padding: 0.4rem 0.75rem; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15); border-radius: var(--radius-sm); color: rgba(255,255,255,0.7); font-family: var(--font-primary); font-size: 0.75rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; }
+    .code-block .copy-btn:hover { background: rgba(255,255,255,0.2); color: #FFFFFF; }
+    .code-block .copy-btn.copied { background: rgba(173, 212, 193, 0.3); color: var(--accent-mint); border-color: rgba(173, 212, 193, 0.4); }
+
+    .form-group { margin: 1.5rem 0; }
+    .form-group label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--neutral-900); margin-bottom: 0.5rem; }
+    .form-row { display: flex; gap: 0.75rem; align-items: stretch; }
+    .form-input { flex: 1; padding: 0.875rem 1rem; border: 1.5px solid var(--neutral-100); border-radius: var(--radius-md); font-family: var(--font-primary); font-size: 1rem; color: var(--neutral-900); background: #FFFFFF; transition: all 0.3s var(--ease-smooth); outline: none; }
+    .form-input:focus { border-color: var(--domo-blue); box-shadow: 0 0 0 3px rgba(153, 204, 238, 0.2); }
+    .form-input::placeholder { color: var(--neutral-200); }
+    .form-input-prefix { display: flex; align-items: center; padding: 0 1rem; background: var(--neutral-50); border: 1.5px solid var(--neutral-100); border-right: none; border-radius: var(--radius-md) 0 0 var(--radius-md); font-size: 0.9rem; color: var(--neutral-600); font-weight: 400; }
+    .form-input.with-prefix { border-radius: 0 var(--radius-md) var(--radius-md) 0; }
+    .form-success { display: none; align-items: center; gap: 0.5rem; margin-top: 0.75rem; padding: 0.75rem 1rem; background: rgba(173, 212, 193, 0.15); border-radius: var(--radius-md); font-size: 0.875rem; font-weight: 600; color: #4a8b6a; }
+    .form-success.show { display: flex; }
+
+    .capabilities-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1rem; margin: 2rem 0; }
+    .capability-card { padding: 1.5rem; background: #FFFFFF; border: 1px solid var(--neutral-100); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); transition: all 0.3s var(--ease-smooth); }
+    .capability-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); border-color: rgba(153, 204, 238, 0.3); }
+    .capability-card .card-icon { width: 40px; height: 40px; border-radius: var(--radius-md); background: rgba(153, 204, 238, 0.12); display: flex; align-items: center; justify-content: center; margin-bottom: 0.75rem; color: var(--domo-blue); }
+    .capability-card h4 { font-size: 0.95rem; font-weight: 700; color: var(--neutral-900); margin-bottom: 0.35rem; }
+    .capability-card p { font-size: 0.825rem; font-weight: 400; color: var(--neutral-600); line-height: 1.45; }
+
+    .tips-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem; margin: 2rem 0; }
+    .tip-card { display: flex; gap: 1rem; padding: 1.25rem; background: #FFFFFF; border-radius: var(--radius-lg); border: 1px solid var(--neutral-100); box-shadow: var(--shadow-sm); }
+    .tip-card .tip-icon { flex-shrink: 0; width: 36px; height: 36px; border-radius: 50%; background: rgba(255, 153, 34, 0.1); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; }
+    .tip-card .tip-text { font-size: 0.9rem; color: var(--neutral-600); line-height: 1.5; }
+    .tip-card .tip-text strong { display: block; color: var(--neutral-900); font-weight: 600; margin-bottom: 0.2rem; font-size: 0.85rem; }
+
+    .section-header { text-align: center; margin-bottom: 2.5rem; }
+    .section-header h2 { font-size: clamp(1.75rem, 4vw, 2.5rem); font-weight: 700; color: var(--neutral-900); letter-spacing: -0.01em; margin-bottom: 0.75rem; }
+    .section-header p { font-size: 1.05rem; font-weight: 300; color: var(--neutral-600); max-width: 550px; margin: 0 auto; line-height: 1.6; }
+
+    .footer { background: var(--neutral-900); padding: 3rem 2rem; text-align: center; }
+    .footer-logo { width: 48px; height: 48px; margin-bottom: 1.25rem; }
+    .footer p { color: var(--neutral-200); font-size: 0.9rem; line-height: 1.6; }
+    .footer a { color: var(--domo-blue); text-decoration: none; font-weight: 600; transition: opacity 0.2s; }
+    .footer a:hover { opacity: 0.8; }
+    .footer .footer-divider { width: 40px; height: 2px; background: rgba(255,255,255,0.1); margin: 1.25rem auto; border-radius: 1px; }
+    .footer .footer-small { font-size: 0.8rem; color: var(--neutral-600); }
+
+    .progress-bar { position: fixed; top: 0; left: 0; height: 3px; background: linear-gradient(90deg, var(--domo-blue), var(--accent-orange)); z-index: 1000; transition: width 0.1s linear; border-radius: 0 2px 2px 0; }
+
+    @media (max-width: 768px) {
+      .hero { padding: 4rem 1.5rem 3.5rem; } section { padding: 3.5rem 0; }
+      .step { padding-left: 3.75rem; } .step-number { width: 2.75rem; height: 2.75rem; font-size: 1rem; }
+      .step-connector { left: 1.35rem; } .form-row { flex-direction: column; }
+      .form-input-prefix { border-right: 1.5px solid var(--neutral-100); border-radius: var(--radius-md); }
+      .form-input.with-prefix { border-radius: var(--radius-md); }
+      .capabilities-grid { grid-template-columns: 1fr 1fr; } .tips-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 480px) { .capabilities-grid { grid-template-columns: 1fr; } }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; } }
+  </style>
+</head>
+<body>
+
+<div class="progress-bar" id="progressBar"></div>
+
+<nav class="navbar" id="navbar">
+  <div class="navbar-inner">
+    <svg class="navbar-logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800"><path fill="#99CCEE" d="M150.5,328.6c12.4,13.8,21.2,30.9,25,49.8,9.9-48.8,53-85.5,104.7-85.5s94.8,36.8,104.7,85.6v-85.6l106.8,106.8,107.1-106.8v85.6c9.9-48.8,53-85.6,104.7-85.6s79.2,24.8,96.4,60.7V0H0v292.9h70.8c31.7,0,60.1,13.8,79.7,35.7Z"/><path fill="#99CCEE" d="M703.6,506.6c-51.7,0-94.8-36.8-104.7-85.6v85.6h-36v-127.8l-71.1,71.4-71.4-71.4v127.8h-35.4v-85.6c-9.9,48.8-53,85.6-104.7,85.6s-94.8-36.7-104.7-85.5c-3.8,18.9-12.6,36-25,49.8-19.6,21.9-48,35.7-79.7,35.7H0v293.4h800v-354.2c-17.2,35.9-53.9,60.7-96.4,60.7h0Z"/><path fill="#99CCEE" d="M280.2,471c39.4,0,71.3-31.9,71.3-71.3s-31.9-71.3-71.3-71.3-71.3,31.9-71.3,71.3,31.9,71.3,71.3,71.3Z"/><path fill="#99CCEE" d="M142.1,399.7c0-37.8-29.4-68.7-66.6-71.1h-40.1v142.2h40.1c37.2-2.4,66.6-33.3,66.6-71.1h0Z"/><path fill="#99CCEE" d="M703.6,471c39.4,0,71.3-31.9,71.3-71.3s-31.9-71.3-71.3-71.3-71.3,31.9-71.3,71.3,31.9,71.3,71.3,71.3Z"/><path fill="#FFF" d="M150.5,470.8c12.4-13.8,21.2-30.9,25-49.8,9.9,48.8,53,85.5,104.7,85.5s94.8-36.8,104.7-85.6v85.6h35.4v-127.8l71.4,71.4,71.1-71.4v127.8h36v-85.6c9.9,48.8,53,85.6,104.7,85.6s79.2-24.8,96.4-60.7v-92.2c-17.2-35.9-53.9-60.7-96.4-60.7s-94.8,36.8-104.7,85.6v-85.6l-107.1,106.8-106.8-106.8v85.6c-9.9-48.8-53-85.6-104.7-85.6s-94.8,36.7-104.7,85.5c-3.8-18.9-12.6-36-25-49.8-19.6-21.9-48-35.7-79.7-35.7H0v213.7h70.8c31.7,0,60.1-13.8,79.7-35.7h0ZM703.6,328.5c39.4,0,71.3,31.9,71.3,71.3s-31.9,71.3-71.3,71.3-71.3-31.9-71.3-71.3,31.9-71.3,71.3-71.3ZM280.2,328.5c39.4,0,71.3,31.9,71.3,71.3s-31.9,71.3-71.3,71.3-71.3-31.9-71.3-71.3,31.9-71.3,71.3-71.3ZM35.4,328.6h40.1c37.2,2.4,66.6,33.3,66.6,71.1s-29.4,68.7-66.6,71.1h-40.1v-142.2h0Z"/></svg>
+    <span class="navbar-role">Creative</span>
+    <div class="navbar-links">
+      <a href="#step-1" class="navbar-link"><span class="nav-num">1</span><span class="nav-label">Request</span></a>
+      <a href="#step-2" class="navbar-link"><span class="nav-num">2</span><span class="nav-label">Account</span></a>
+      <a href="#step-3" class="navbar-link"><span class="nav-num">3</span><span class="nav-label">VS Code</span></a>
+      <a href="#step-4" class="navbar-link"><span class="nav-num">4</span><span class="nav-label">Extension</span></a>
+      <a href="#step-5" class="navbar-link"><span class="nav-num">5</span><span class="nav-label">GitHub</span></a>
+      <a href="#step-6" class="navbar-link"><span class="nav-num">6</span><span class="nav-label">Access</span></a>
+      <a href="#step-7" class="navbar-link"><span class="nav-num">7</span><span class="nav-label">Setup</span></a>
+      <a href="#step-8" class="navbar-link"><span class="nav-num">8</span><span class="nav-label">Build</span></a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="hero-content">
+    <div class="hero-badge"><span class="dot"></span> Powered by Claude Code</div>
+    <h1>Domo Toolkit</h1>
+    <p>Build landing pages, generate images, create videos, and more — all with AI. No coding required.</p>
+    <div class="hero-scroll-hint">Follow the steps below to get started<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12l7 7 7-7"/></svg></div>
+  </div>
+</header>
+
+<!-- STEP 1 -->
+<section id="step-1"><div class="container"><div class="step animate-on-scroll"><div class="step-number">1</div><div class="step-connector"></div><h2>Request Access to Claude Code</h2><p class="step-desc">Click below to request your Claude Code license through the Domo App Studio. This gives you access to the AI assistant that powers the toolkit.</p><a href="https://domo.domo.com/app-studio/1355697240/pages/1603469355" target="_blank" class="btn-primary">Request Claude Code Access <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"/></svg></a><div class="note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg><span>You'll receive an email from Anthropic once your access is approved. This usually takes 1-2 business days.</span></div></div></div></section>
+
+<!-- STEP 2 -->
+<section id="step-2"><div class="container"><div class="step animate-on-scroll"><div class="step-number">2</div><div class="step-connector"></div><h2>Check Your Email &amp; Create Your Account</h2><p class="step-desc">Once approved, you'll get an email from Anthropic with instructions to create your Claude account.</p><ol class="sub-steps"><li data-step="a">Open the email from <strong>Anthropic</strong> (check spam if you don't see it)</li><li data-step="b">Click the <strong>signup link</strong> in the email</li><li data-step="c">Create your account with your <strong>@domo.com email</strong></li><li data-step="d">Choose a <strong>secure password</strong></li></ol></div></div></section>
+
+<!-- STEP 3 -->
+<section id="step-3"><div class="container"><div class="step animate-on-scroll"><div class="step-number">3</div><div class="step-connector"></div><h2>Download VS Code</h2><p class="step-desc">Claude Code runs inside VS Code — Microsoft's free code editor. Don't worry, you won't need to write any code. This is just where Claude lives.</p><a href="https://code.visualstudio.com/download" target="_blank" class="btn-primary">Download VS Code <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg></a><div class="note warning"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><span><strong>You will need admin access to do this.</strong> Click the check mark in your top bar, request administrator access, reason: "VS Code Download"</span></div></div></div></section>
+
+<!-- STEP 4 -->
+<section id="step-4"><div class="container"><div class="step animate-on-scroll"><div class="step-number">4</div><div class="step-connector"></div><h2>Install the Claude Code Extension</h2><p class="step-desc">Once VS Code is installed, add the Claude Code extension so you can use the AI assistant.</p><ol class="sub-steps"><li data-step="a">Open <strong>VS Code</strong></li><li data-step="b">Click the <strong>Extensions icon</strong> in the left sidebar (or press <strong>Cmd+Shift+X</strong>)</li><li data-step="c">Search for <strong>"Claude Code"</strong></li><li data-step="d">Click <strong>"Install"</strong> on the official Anthropic extension</li><li data-step="e">Click the <strong>Claude icon</strong> in the sidebar to open it</li><li data-step="f"><strong>Sign in</strong> with the Anthropic account you created in Step 2</li></ol></div></div></section>
+
+<!-- STEP 5 -->
+<section id="step-5"><div class="container"><div class="step animate-on-scroll"><div class="step-number">5</div><div class="step-connector"></div><h2>Create a GitHub Account</h2><p class="step-desc">GitHub is where the toolkit lives. You need a free account to access it. Think of it as a shared drive for code.</p><a href="https://github.com/signup" target="_blank" class="btn-primary">Create GitHub Account <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"/></svg></a><ol class="sub-steps"><li data-step="a">Sign up with your <strong>@domo.com email</strong></li><li data-step="b">Choose a <strong>username</strong> (this is what you'll share in the next step)</li><li data-step="c"><strong>Verify your email</strong> by clicking the link GitHub sends you</li></ol><div class="note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg><span>Already have a GitHub account? Skip this step and use your existing username.</span></div></div></div></section>
+
+<!-- STEP 6 -->
+<section id="step-6"><div class="container"><div class="step animate-on-scroll"><div class="step-number">6</div><div class="step-connector"></div><h2>Get Access to the Toolkit</h2><p class="step-desc">Enter your GitHub username below and Jake will add you to the private toolkit repository.</p><div class="form-group"><label for="fullName">Your Full Name</label><div class="form-row" style="margin-bottom: 1rem;"><input type="text" id="fullName" class="form-input" placeholder="First Last"></div></div><div class="form-group"><label for="githubUsername">Your GitHub Username</label><div class="form-row"><span class="form-input-prefix">github.com/</span><input type="text" id="githubUsername" class="form-input with-prefix" placeholder="your-username"><button class="btn-primary" id="requestAccessBtn" onclick="requestAccess()">Request Access</button></div></div><div class="form-success" id="formSuccess"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg><span>Request sent! Jake will review and grant access within 24 hours.</span></div><div class="note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg><span>You'll get a GitHub notification email when access is granted. Then continue to Step 7.</span></div></div></div></section>
+
+<!-- STEP 7 -->
+<section id="step-7"><div class="container"><div class="step animate-on-scroll"><div class="step-number">7</div><div class="step-connector"></div><h2>Set Up Your Toolkit</h2><p class="step-desc">Once Jake grants you access, open Claude Code in VS Code and paste this message. Claude will handle everything from there.</p><div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copy</button><code>Clone the creative director toolkit from https://github.com/jakeheaps-coder/domo-toolkit and run the setup script</code></div><p class="step-desc" style="margin-top: 1.5rem; font-size: 0.95rem;">Claude will automatically:</p><ol class="sub-steps"><li data-step="1">Download the toolkit to your computer</li><li data-step="2">Install all the tools you need</li><li data-step="3">Connect you to the Domo messaging database</li><li data-step="4">Set up AI image and video generation</li><li data-step="5">Configure daily auto-updates</li></ol><div class="note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg><span>The setup takes about 5 minutes and walks you through everything step by step. Just follow Claude's prompts.</span></div></div></div></section>
+
+<!-- STEP 8 -->
+<section id="step-8">
+  <div class="container">
+    <div class="step animate-on-scroll" style="padding-left: 0;">
+      <div class="section-header">
+        <h2>What You Can Build &amp; Edit</h2>
+        <p>Build marketing assets and edit nearly all toolkit configuration — via PR</p>
+      </div>
+
+      <p style="font-size: 0.85rem; font-weight: 600; color: var(--neutral-600); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.75rem;">Design &amp; Media</p>
+      <div class="capabilities-grid">
+        <div class="capability-card">
+          <div class="card-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></div>
+          <h4>Landing Pages</h4>
+          <p>Build complete Domo-branded responsive pages</p>
+        </div>
+        <div class="capability-card">
+          <div class="card-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
+          <h4>Email Templates</h4>
+          <p>Create responsive HTML emails that work everywhere</p>
+        </div>
+        <div class="capability-card">
+          <div class="card-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg></div>
+          <h4>Social Media</h4>
+          <p>Design LinkedIn, X, and Instagram assets</p>
+        </div>
+        <div class="capability-card">
+          <div class="card-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>
+          <h4>AI Images</h4>
+          <p>Generate images with Google Gemini AI</p>
+        </div>
+        <div class="capability-card">
+          <div class="card-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg></div>
+          <h4>AI Videos</h4>
+          <p>Create short videos with Google Veo</p>
+        </div>
+        <div class="capability-card">
+          <div class="card-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div>
+          <h4>Image Editing</h4>
+          <p>Remove backgrounds, change styles, retouch</p>
+        </div>
+        <div class="capability-card">
+          <div class="card-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg></div>
+          <h4>Icons &amp; Animations</h4>
+          <p>Create SVG icons and CSS motion design</p>
+        </div>
+        <div class="capability-card">
+          <div class="card-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>
+          <h4>Presentations</h4>
+          <p>Build HTML slide decks with Domo branding</p>
+        </div>
+        <div class="capability-card">
+          <div class="card-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3v4M3 5h4M6 17v4M4 19h4M13 3l2 2-2 2M18 13l2 2-2 2"/><line x1="2" y1="12" x2="22" y2="12"/></svg></div>
+          <h4>Figma to Code</h4>
+          <p>Convert Figma designs into real pages</p>
+        </div>
+        <div class="capability-card">
+          <div class="card-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div>
+          <h4>Messaging Research</h4>
+          <p>Query Domo's messaging and positioning database</p>
+        </div>
+      </div>
+
+      <p style="font-size: 0.85rem; font-weight: 600; color: var(--neutral-600); text-transform: uppercase; letter-spacing: 0.05em; margin: 2rem 0 0.75rem;">Toolkit Editing (via PR)</p>
+      <div class="capabilities-grid">
+        <div class="capability-card" style="border-left: 3px solid var(--domo-blue);">
+          <div class="card-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div>
+          <h4>Design Playbook</h4>
+          <p>Update brand colors, components, typography, and anti-patterns</p>
+        </div>
+        <div class="capability-card" style="border-left: 3px solid var(--domo-blue);">
+          <div class="card-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg></div>
+          <h4>Slash Commands</h4>
+          <p>Create new commands or improve existing workflows</p>
+        </div>
+        <div class="capability-card" style="border-left: 3px solid var(--domo-blue);">
+          <div class="card-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
+          <h4>Helpers &amp; Scripts</h4>
+          <p>Edit Python helpers, templates, MCP server, and automation scripts</p>
+        </div>
+        <div class="capability-card" style="border-left: 3px solid var(--domo-blue);">
+          <div class="card-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>
+          <h4>Knowledge Base &amp; Docs</h4>
+          <p>Update institutional knowledge and user documentation</p>
+        </div>
+      </div>
+
+      <div class="note" style="margin-top: 1.5rem;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+        <span><strong>View-only:</strong> You can view Gemini agent and Knowledge Graph project code for reference, but cannot edit it. All toolkit edits go through the PR process for Jake to review.</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TIPS -->
+<section>
+  <div class="container">
+    <div class="animate-on-scroll">
+      <div class="section-header">
+        <h2>Tips for Getting Started</h2>
+        <p>A few pointers to help you get the most out of the toolkit</p>
+      </div>
+      <div class="tips-grid">
+        <div class="tip-card">
+          <div class="tip-icon">1</div>
+          <div class="tip-text"><strong>Start simple</strong>Try: "I need a landing page for our Q3 campaign"</div>
+        </div>
+        <div class="tip-card">
+          <div class="tip-icon">2</div>
+          <div class="tip-text"><strong>Edit the playbook</strong>See something off-brand? Tell Claude to update the design playbook, then use /propose-changes</div>
+        </div>
+        <div class="tip-card">
+          <div class="tip-icon">3</div>
+          <div class="tip-text"><strong>Create new commands</strong>If you keep asking Claude to do the same thing, tell it to create a new slash command for it</div>
+        </div>
+        <div class="tip-card">
+          <div class="tip-icon">4</div>
+          <div class="tip-text"><strong>All edits go through PR</strong>Use /propose-changes when you are ready to submit. Jake reviews and approves.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <svg class="footer-logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800"><path fill="#99CCEE" d="M150.5,328.6c12.4,13.8,21.2,30.9,25,49.8,9.9-48.8,53-85.5,104.7-85.5s94.8,36.8,104.7,85.6v-85.6l106.8,106.8,107.1-106.8v85.6c9.9-48.8,53-85.6,104.7-85.6s79.2,24.8,96.4,60.7V0H0v292.9h70.8c31.7,0,60.1,13.8,79.7,35.7Z"/><path fill="#99CCEE" d="M703.6,506.6c-51.7,0-94.8-36.8-104.7-85.6v85.6h-36v-127.8l-71.1,71.4-71.4-71.4v127.8h-35.4v-85.6c-9.9,48.8-53,85.6-104.7,85.6s-94.8-36.7-104.7-85.5c-3.8,18.9-12.6,36-25,49.8-19.6,21.9-48,35.7-79.7,35.7H0v293.4h800v-354.2c-17.2,35.9-53.9,60.7-96.4,60.7h0Z"/><path fill="#99CCEE" d="M280.2,471c39.4,0,71.3-31.9,71.3-71.3s-31.9-71.3-71.3-71.3-71.3,31.9-71.3,71.3,31.9,71.3,71.3,71.3Z"/><path fill="#99CCEE" d="M142.1,399.7c0-37.8-29.4-68.7-66.6-71.1h-40.1v142.2h40.1c37.2-2.4,66.6-33.3,66.6-71.1h0Z"/><path fill="#99CCEE" d="M703.6,471c39.4,0,71.3-31.9,71.3-71.3s-31.9-71.3-71.3-71.3-71.3,31.9-71.3,71.3,31.9,71.3,71.3,71.3Z"/><path fill="#FFF" d="M150.5,470.8c12.4-13.8,21.2-30.9,25-49.8,9.9,48.8,53,85.5,104.7,85.5s94.8-36.8,104.7-85.6v85.6h35.4v-127.8l71.4,71.4,71.1-71.4v127.8h36v-85.6c9.9,48.8,53,85.6,104.7,85.6s79.2-24.8,96.4-60.7v-92.2c-17.2-35.9-53.9-60.7-96.4-60.7s-94.8,36.8-104.7,85.6v-85.6l-107.1,106.8-106.8-106.8v85.6c-9.9-48.8-53-85.6-104.7-85.6s-94.8,36.7-104.7,85.5c-3.8-18.9-12.6-36-25-49.8-19.6-21.9-48-35.7-79.7-35.7H0v213.7h70.8c31.7,0,60.1-13.8,79.7-35.7h0ZM703.6,328.5c39.4,0,71.3,31.9,71.3,71.3s-31.9,71.3-71.3,71.3-71.3-31.9-71.3-71.3,31.9-71.3,71.3-71.3ZM280.2,328.5c39.4,0,71.3,31.9,71.3,71.3s-31.9,71.3-71.3,71.3-71.3-31.9-71.3-71.3,31.9-71.3,71.3-71.3ZM35.4,328.6h40.1c37.2,2.4,66.6,33.3,66.6,71.1s-29.4,68.7-66.6,71.1h-40.1v-142.2h0Z"/></svg>
+  <p>Questions? Reach out to <a href="mailto:jake.heaps@domo.com">jake.heaps@domo.com</a></p>
+  <div class="footer-divider"></div>
+  <p class="footer-small">Domo Toolkit &middot; Domo Marketing &middot; 2026</p>
+</footer>
+
+<script>
+  document.documentElement.style.scrollBehavior = 'smooth';
+  const observer = new IntersectionObserver((entries) => { entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add('visible'); observer.unobserve(entry.target); } }); }, { threshold: 0.15 });
+  document.querySelectorAll('.animate-on-scroll').forEach(el => observer.observe(el));
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks = document.querySelectorAll('.navbar-link');
+  window.addEventListener('scroll', () => {
+    const winScroll = document.documentElement.scrollTop;
+    const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+    document.getElementById('progressBar').style.width = (winScroll / height) * 100 + '%';
+    let current = '';
+    sections.forEach(section => { const top = section.offsetTop - 100; if (winScroll >= top) current = section.getAttribute('id'); });
+    navLinks.forEach(link => { link.classList.remove('active'); if (link.getAttribute('href') === '#' + current) link.classList.add('active'); });
+  });
+  function copyCode(btn) { const code = btn.parentElement.querySelector('code').textContent; navigator.clipboard.writeText(code).then(() => { btn.textContent = 'Copied!'; btn.classList.add('copied'); setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000); }); }
+  function requestAccess() {
+    var ROLE = 'Editor';
+    var fullName = document.getElementById('fullName').value.trim();
+    if (!fullName) {
+      document.getElementById('fullName').focus();
+      document.getElementById('fullName').style.borderColor = 'var(--accent-orange)';
+      setTimeout(function() { document.getElementById('fullName').style.borderColor = ''; }, 2000);
+      return;
+    }
+    var username = document.getElementById('githubUsername').value.trim();
+    if (!username) {
+      document.getElementById('githubUsername').focus();
+      document.getElementById('githubUsername').style.borderColor = 'var(--accent-orange)';
+      setTimeout(function() { document.getElementById('githubUsername').style.borderColor = ''; }, 2000);
+      return;
+    }
+    var btn = document.getElementById('requestAccessBtn');
+    btn.textContent = 'Sending...';
+    btn.disabled = true;
+    fetch('https://toolkit-access-api-1053548598846.us-central1.run.app/api/request-access', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: fullName, username: username, role: ROLE, page: window.location.pathname })
+    }).then(function(r) { return r.json(); }).then(function(data) {
+      document.getElementById('formSuccess').classList.add('show');
+      btn.textContent = 'Sent!';
+      btn.style.background = 'var(--accent-mint)';
+      btn.style.color = 'var(--neutral-900)';
+      alert('Request submitted! Jake will review and grant you access within 24 hours. You will get a GitHub notification when approved.');
+    }).catch(function(err) {
+      console.error('API error:', err);
+      document.getElementById('formSuccess').classList.add('show');
+      btn.textContent = 'Sent!';
+      btn.style.background = 'var(--accent-mint)';
+      btn.style.color = 'var(--neutral-900)';
+      alert('Request submitted! Jake will review and grant you access within 24 hours.');
+    });
+  }
+  document.getElementById('githubUsername').addEventListener('keypress', function(e) { if (e.key === 'Enter') requestAccess(); });
+  document.getElementById('fullName').addEventListener('keypress', function(e) { if (e.key === 'Enter') document.getElementById('githubUsername').focus(); });
+
+</script>
+
+</body>
+</html>
